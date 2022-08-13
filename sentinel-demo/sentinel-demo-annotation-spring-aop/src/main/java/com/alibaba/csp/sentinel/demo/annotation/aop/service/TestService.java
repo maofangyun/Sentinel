@@ -20,7 +20,7 @@ package com.alibaba.csp.sentinel.demo.annotation.aop.service;
  */
 public interface TestService {
 
-    void test();
+    String test();
 
     String hello(long s);
 

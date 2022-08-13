@@ -38,7 +38,7 @@ public class DefaultSlotChainBuilder implements SlotChainBuilder {
     @Override
     public ProcessorSlotChain build() {
         ProcessorSlotChain chain = new DefaultProcessorSlotChain();
-
+        // 构建插槽处理链
         List<ProcessorSlot> sortedSlotList = SpiLoader.of(ProcessorSlot.class).loadInstanceListSorted();
         for (ProcessorSlot slot : sortedSlotList) {
             if (!(slot instanceof AbstractLinkedProcessorSlot)) {

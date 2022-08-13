@@ -343,6 +343,7 @@ public class CtSph implements Sph {
     @Override
     public Entry entryWithType(String name, int resourceType, EntryType entryType, int count, boolean prioritized,
                                Object[] args) throws BlockException {
+        // 将@SentinelResource注解的信息封装成对象
         StringResourceWrapper resource = new StringResourceWrapper(name, entryType, resourceType);
         return entryWithPriority(resource, count, prioritized, args);
     }

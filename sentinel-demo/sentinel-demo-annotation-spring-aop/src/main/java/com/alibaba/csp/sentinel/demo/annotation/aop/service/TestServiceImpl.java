@@ -16,8 +16,8 @@
 package com.alibaba.csp.sentinel.demo.annotation.aop.service;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
-import com.alibaba.csp.sentinel.slots.block.BlockException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,10 +26,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestServiceImpl implements TestService {
 
+    @Autowired
+    private TestService testService;
+
     @Override
     @SentinelResource(value = "test", blockHandler = "handleException", blockHandlerClass = {ExceptionUtil.class})
-    public void test() {
+    public String test() {
         System.out.println("Test");
+        return testService.hello(-1);
     }
 
     @Override
@@ -42,8 +46,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    @SentinelResource(value = "helloAnother", defaultFallback = "defaultFallback",
-        exceptionsToIgnore = {IllegalStateException.class})
+    @SentinelResource(value = "helloAnother", defaultFallback = "defaultFallback",exceptionsToIgnore = {IllegalStateException.class})
     public String helloAnother(String name) {
         if (name == null || "bad".equals(name)) {
             throw new IllegalArgumentException("oops");
