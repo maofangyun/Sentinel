@@ -119,10 +119,12 @@ class CtEntry extends Entry {
                 if (parent == null) {
                     // Default context (auto entered) will be exited automatically.
                     if (ContextUtil.isDefaultContext(context)) {
+                        // 将Context从contextHolder这个ThreadLocal中清除
                         ContextUtil.exit();
                     }
                 }
                 // Clean the reference of context in current entry to avoid duplicate exit.
+                // 将凭证Entry中的Context属性置为null
                 clearEntryContext();
             }
         }

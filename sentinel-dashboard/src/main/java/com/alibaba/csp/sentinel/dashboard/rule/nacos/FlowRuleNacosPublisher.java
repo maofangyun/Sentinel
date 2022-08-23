@@ -37,6 +37,9 @@ public class FlowRuleNacosPublisher implements DynamicRulePublisher<List<FlowRul
     @Autowired
     private Converter<List<FlowRuleEntity>, String> converter;
 
+    /**
+     * 通过configService的publishConfig()方法将rules发布到nacos
+     * */
     @Override
     public void publish(String app, List<FlowRuleEntity> rules) throws Exception {
         AssertUtil.notEmpty(app, "app name cannot be empty");

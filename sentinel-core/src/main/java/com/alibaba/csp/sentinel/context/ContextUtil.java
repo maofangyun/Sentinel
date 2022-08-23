@@ -120,8 +120,12 @@ public class ContextUtil {
     protected static Context trueEnter(String name, String origin) {
         Context context = contextHolder.get();
         if (context == null) {
+            // 这里的DefaultNode其实就是EntranceNode
+            // contextNameNodeMap的key是contextName
             Map<String, DefaultNode> localCacheNameMap = contextNameNodeMap;
+            // 一个contextName对应一个EntranceNode
             DefaultNode node = localCacheNameMap.get(name);
+            // 双重检查锁,保证线程安全
             if (node == null) {
                 if (localCacheNameMap.size() > Constants.MAX_CONTEXT_NAME_SIZE) {
                     setNullContext();
@@ -138,7 +142,7 @@ public class ContextUtil {
                                 node = new EntranceNode(new StringResourceWrapper(name, EntryType.IN), null);
                                 // Add entrance node.
                                 Constants.ROOT.addChild(node);
-
+                                // 写时复制的原理,防止读写冲突,因为读不需要加锁,所以最大程度的避免锁竞争
                                 Map<String, DefaultNode> newMap = new HashMap<>(contextNameNodeMap.size() + 1);
                                 newMap.putAll(contextNameNodeMap);
                                 newMap.put(name, node);

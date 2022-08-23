@@ -38,6 +38,10 @@ public class FlowRuleNacosProvider implements DynamicRuleProvider<List<FlowRuleE
     @Autowired
     private Converter<String, List<FlowRuleEntity>> converter;
 
+    /**
+     * 1）通过ConfigService的getConfig()方法从Nacos Config Server读取指定配置信息
+     * 2）通过转为converter转化为FlowRule规则
+     */
     @Override
     public List<FlowRuleEntity> getRules(String appName) throws Exception {
         String rules = configService.getConfig(appName + NacosConfigUtil.FLOW_DATA_ID_POSTFIX,
