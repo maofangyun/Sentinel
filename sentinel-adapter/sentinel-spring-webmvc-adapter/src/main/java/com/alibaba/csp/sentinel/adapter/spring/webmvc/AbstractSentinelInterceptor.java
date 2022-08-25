@@ -88,6 +88,7 @@ public abstract class AbstractSentinelInterceptor implements HandlerInterceptor 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
         throws Exception {
         try {
+            // 对于webmvc,资源名称为url的地址(带占位符的,例如/baz/{name})
             String resourceName = getResourceName(request);
 
             if (StringUtil.isEmpty(resourceName)) {
@@ -99,9 +100,13 @@ public abstract class AbstractSentinelInterceptor implements HandlerInterceptor 
             }
             
             // Parse the request origin using registered origin parser.
+            // 从request请求头中提取来源信息origin
             String origin = parseOrigin(request);
+            // wenmvc的上下文名称统一都是sentinel_spring_web_context
             String contextName = getContextName(request);
+            // 创建Context,并保存到ThreadLocal中
             ContextUtil.enter(contextName, origin);
+            // 尝试获取凭证Entry,若当前请求触发规则限制,则抛出BlockException异常
             Entry entry = SphU.entry(resourceName, ResourceTypeConstants.COMMON_WEB, EntryType.IN);
             request.setAttribute(baseWebMvcConfig.getRequestAttributeName(), entry);
             return true;

@@ -117,6 +117,9 @@ public class ContextUtil {
         return trueEnter(name, origin);
     }
 
+    /**
+     * 创建Context
+     * */
     protected static Context trueEnter(String name, String origin) {
         Context context = contextHolder.get();
         if (context == null) {
@@ -127,6 +130,9 @@ public class ContextUtil {
             DefaultNode node = localCacheNameMap.get(name);
             // 双重检查锁,保证线程安全
             if (node == null) {
+                // 判断Context的数量是否已经达到指定的最大值2000,
+                // 当此判断为真时,将Context设置为NullContext,
+                // NullContext意味着不会进行任何规则检查
                 if (localCacheNameMap.size() > Constants.MAX_CONTEXT_NAME_SIZE) {
                     setNullContext();
                     return NULL_CONTEXT;
@@ -141,8 +147,10 @@ public class ContextUtil {
                             } else {
                                 node = new EntranceNode(new StringResourceWrapper(name, EntryType.IN), null);
                                 // Add entrance node.
+                                // 将EntranceNode直接缓存到根节点ROOT下,后续的DefaultNode节点将挂到EntranceNode下
                                 Constants.ROOT.addChild(node);
-                                // 写时复制的原理,防止读写冲突,因为读不需要加锁,所以最大程度的避免锁竞争
+                                // 写时复制的原理,防止读写冲突,
+                                // 为了读的性能最大化,所以读不加锁,所以最大程度的避免锁竞争
                                 Map<String, DefaultNode> newMap = new HashMap<>(contextNameNodeMap.size() + 1);
                                 newMap.putAll(contextNameNodeMap);
                                 newMap.put(name, node);

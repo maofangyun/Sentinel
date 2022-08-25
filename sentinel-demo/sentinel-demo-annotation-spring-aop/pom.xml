@@ -29,6 +29,11 @@
             <groupId>com.alibaba.csp</groupId>
             <artifactId>sentinel-transport-simple-http</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-spring-webmvc-adapter</artifactId>
+            <version>1.8.5</version>
+        </dependency>
         <!-- 通过nacos持久化流控规则 -->
         <dependency>
             <groupId>com.alibaba.csp</groupId>
@@ -58,6 +63,10 @@
                 <exclusion>
                     <groupId>com.alibaba.csp</groupId>
                     <artifactId>sentinel-cluster-client-default</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba.csp</groupId>
+                    <artifactId>sentinel-spring-webmvc-adapter</artifactId>
                 </exclusion>
             </exclusions>
             <version>2021.1</version>

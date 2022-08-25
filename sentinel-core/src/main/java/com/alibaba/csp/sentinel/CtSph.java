@@ -130,10 +130,11 @@ public class CtSph implements Sph {
         }
 
         // Global switch is close, no rule checking will do.
+        // 全局开关为关闭时,不进行规则检查
         if (!Constants.ON) {
             return new CtEntry(resourceWrapper, null, context);
         }
-        // 一个资源对应一个SlotChain
+        // 一个资源名称对应一个SlotChain
         ProcessorSlot<Object> chain = lookProcessChain(resourceWrapper);
 
         /*
