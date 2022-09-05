@@ -117,9 +117,10 @@ public abstract class LeapArray<T> {
         if (timeMillis < 0) {
             return null;
         }
-
+        // 计算获取指定时间的时间窗口的索引位置(指定时间落在哪个时间窗口)
         int idx = calculateTimeIdx(timeMillis);
         // Calculate current bucket start time.
+        // 计算指定时间的时间窗口的开始时间
         long windowStart = calculateWindowStart(timeMillis);
 
         /*
@@ -130,6 +131,7 @@ public abstract class LeapArray<T> {
          * (3) Bucket is deprecated, then reset current bucket and clean all deprecated buckets.
          */
         while (true) {
+            // 获取时间窗口的实体对象
             WindowWrap<T> old = array.get(idx);
             if (old == null) {
                 /*
@@ -145,11 +147,13 @@ public abstract class LeapArray<T> {
                  * succeed to update, while other threads yield its time slice.
                  */
                 WindowWrap<T> window = new WindowWrap<T>(windowLengthInMs, windowStart, newEmptyBucket(timeMillis));
+                // CAS操作尝试更新array中的元素
                 if (array.compareAndSet(idx, null, window)) {
                     // Successfully updated, return the created bucket.
                     return window;
                 } else {
                     // Contention failed, the thread will yield its time slice to wait for bucket available.
+                    // CAS更新失败,则当前线程让出时间片
                     Thread.yield();
                 }
             } else if (windowStart == old.windowStart()) {

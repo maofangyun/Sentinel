@@ -15,6 +15,7 @@
  */
 package com.alibaba.csp.sentinel.demo.annotation.aop.service;
 
+import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    @SentinelResource(value = "helloAnother", defaultFallback = "defaultFallback",exceptionsToIgnore = {IllegalStateException.class})
+    @SentinelResource(value = "helloAnother", entryType = EntryType.IN, defaultFallback = "defaultFallback",exceptionsToIgnore = {IllegalStateException.class})
     public String helloAnother(String name) {
         if (name == null || "bad".equals(name)) {
             throw new IllegalArgumentException("oops");

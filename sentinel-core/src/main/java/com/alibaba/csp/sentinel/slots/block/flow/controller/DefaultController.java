@@ -48,7 +48,9 @@ public class DefaultController implements TrafficShapingController {
     @Override
     public boolean canPass(Node node, int acquireCount, boolean prioritized) {
         int curCount = avgUsedTokens(node);
+        // 就是通过简单的计数,判断是否应该限流
         if (curCount + acquireCount > count) {
+            // prioritized一般都是false,故下面的逻辑不会执行
             if (prioritized && grade == RuleConstant.FLOW_GRADE_QPS) {
                 long currentTime;
                 long waitInMs;

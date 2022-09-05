@@ -164,6 +164,7 @@ public class NodeSelectorSlot extends AbstractLinkedProcessorSlot<Object> {
                     cacheMap.put(context.getName(), node);
                     map = cacheMap;
                     // Build invocation tree
+                    // 构建当前请求的调用链路
                     ((DefaultNode) context.getLastNode()).addChild(node);
                 }
 
