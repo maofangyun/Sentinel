@@ -98,8 +98,10 @@ public abstract class LeapArray<T> {
     protected abstract WindowWrap<T> resetWindowTo(WindowWrap<T> windowWrap, long startTime);
 
     private int calculateTimeIdx(/*@Valid*/ long timeMillis) {
+        // 指定的时间 ➗ 时间窗口的长度 = 指定时间的有多少个时间窗口长度
         long timeId = timeMillis / windowLengthInMs;
         // Calculate current index so we can map the timestamp to the leap array.
+        // 获取指定时间在时间窗口数组中的索引位置
         return (int)(timeId % array.length());
     }
 
@@ -130,9 +132,11 @@ public abstract class LeapArray<T> {
          * (2) Bucket is up-to-date, then just return the bucket.
          * (3) Bucket is deprecated, then reset current bucket and clean all deprecated buckets.
          */
+        // 环形时间窗口
         while (true) {
             // 获取时间窗口的实体对象
             WindowWrap<T> old = array.get(idx);
+            // 旧时间窗口为null,一般都是应用刚刚启动,还没有请求访问的时候,才会为null
             if (old == null) {
                 /*
                  *     B0       B1      B2    NULL      B4
@@ -153,10 +157,11 @@ public abstract class LeapArray<T> {
                     return window;
                 } else {
                     // Contention failed, the thread will yield its time slice to wait for bucket available.
-                    // CAS更新失败,则当前线程让出时间片
+                    // CAS更新失败,则当前线程让出时间片,等待下次循环再次尝试CAS
                     Thread.yield();
                 }
             } else if (windowStart == old.windowStart()) {
+                // 这种场景,针对的是多个请求同时到来,落在了同一个时间窗口,就直接返回旧的时间窗口,将到来的请求的计数都算在这个时间窗口中
                 /*
                  *     B0       B1      B2     B3      B4
                  * ||_______|_______|_______|_______|_______||___
@@ -170,6 +175,7 @@ public abstract class LeapArray<T> {
                  */
                 return old;
             } else if (windowStart > old.windowStart()) {
+                // 这种场景,针对的是应用处于流量低峰时,很久才过来下一个请求,因此新的windowStart会比旧的windowStart大
                 /*
                  *   (old)
                  *             B0       B1      B2    NULL      B4
@@ -190,6 +196,7 @@ public abstract class LeapArray<T> {
                 if (updateLock.tryLock()) {
                     try {
                         // Successfully get the update lock, now we reset the bucket.
+                        // 通过清空旧时间窗口中的计数,并修改旧时间窗口的开始时间,实现滑动时间窗口
                         return resetWindowTo(old, windowStart);
                     } finally {
                         updateLock.unlock();

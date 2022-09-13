@@ -47,6 +47,7 @@ public class DefaultController implements TrafficShapingController {
 
     @Override
     public boolean canPass(Node node, int acquireCount, boolean prioritized) {
+        // 通过节点所代表的资源,获取资源当前的请求计数
         int curCount = avgUsedTokens(node);
         // 就是通过简单的计数,判断是否应该限流
         if (curCount + acquireCount > count) {
@@ -74,6 +75,7 @@ public class DefaultController implements TrafficShapingController {
         if (node == null) {
             return DEFAULT_AVG_USED_TOKENS;
         }
+        // 根据是线程数限流还是请求数限流，决定返回计数的类型
         return grade == RuleConstant.FLOW_GRADE_THREAD ? node.curThreadNum() : (int)(node.passQps());
     }
 
