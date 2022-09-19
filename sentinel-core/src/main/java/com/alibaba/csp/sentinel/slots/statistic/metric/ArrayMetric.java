@@ -241,6 +241,7 @@ public class ArrayMetric implements Metric {
 
     @Override
     public void addPass(int count) {
+        // data是OccupiableBucketLeapArray类型的
         WindowWrap<MetricBucket> wrap = data.currentWindow();
         wrap.value().addPass(count);
     }

@@ -59,7 +59,9 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
             fireEntry(context, resourceWrapper, node, count, prioritized, args);
 
             // Request passed, add thread count and pass count.
+            // 请求正常通过,线程计数加1
             node.increaseThreadNum();
+            // 请求正常通过,在对应的时间窗口中增加MetricEvent.PASS的计数
             node.addPassRequest(count);
 
             if (context.getCurEntry().getOriginNode() != null) {
@@ -98,6 +100,7 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
             context.getCurEntry().setBlockError(e);
 
             // Add block count.
+            // 请求被拦截,在对应的时间窗口中增加MetricEvent.BLOCK的计数
             node.increaseBlockQps(count);
             if (context.getCurEntry().getOriginNode() != null) {
                 context.getCurEntry().getOriginNode().increaseBlockQps(count);
@@ -116,6 +119,8 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
             throw e;
         } catch (Throwable e) {
             // Unexpected internal error, set error to current entry.
+            // 这里将异常信息放到Entry中,entry()方法中不进行异常的处理,
+            // 真正的异常处理逻辑放在exit()方法中
             context.getCurEntry().setError(e);
 
             throw e;
@@ -135,6 +140,7 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
             Throwable error = context.getCurEntry().getError();
 
             // Record response time and success count.
+            // 在请求对应的时间窗口,记录响应时间和成功计数
             recordCompleteFor(node, count, rt, error);
             recordCompleteFor(context.getCurEntry().getOriginNode(), count, rt, error);
             if (resourceWrapper.getEntryType() == EntryType.IN) {
@@ -156,10 +162,13 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
         if (node == null) {
             return;
         }
+        // 请求对应的时间窗口记录响应时间和成功计数
         node.addRtAndSuccess(rt, batchCount);
+        // 请求处理完毕，线程数减1
         node.decreaseThreadNum();
 
         if (error != null && !(error instanceof BlockException)) {
+            // 请求抛出异常,在对应的时间窗口中增加MetricEvent.EXCEPTION的计数
             node.increaseExceptionQps(batchCount);
         }
     }

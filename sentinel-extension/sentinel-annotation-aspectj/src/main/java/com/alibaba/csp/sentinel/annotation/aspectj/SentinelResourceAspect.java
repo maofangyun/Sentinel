@@ -53,9 +53,11 @@ public class SentinelResourceAspect extends AbstractSentinelAspectSupport {
         int resourceType = annotation.resourceType();
         Entry entry = null;
         try {
+            // 校验当前请求是否应该被拦截限流
             entry = SphU.entry(resourceName, resourceType, entryType, pjp.getArgs());
             return pjp.proceed();
         } catch (BlockException ex) {
+            // 发生阻塞异常,说明当前请求不被允许执行,被限流了
             return handleBlockException(pjp, annotation, ex);
         } catch (Throwable ex) {
             Class<? extends Throwable>[] exceptionsToIgnore = annotation.exceptionsToIgnore();
@@ -72,6 +74,7 @@ public class SentinelResourceAspect extends AbstractSentinelAspectSupport {
             throw ex;
         } finally {
             if (entry != null) {
+                // 执行凭证entry的退出逻辑,也非常重要
                 entry.exit(1, pjp.getArgs());
             }
         }

@@ -76,6 +76,7 @@ public final class TimeUtil implements Runnable {
     private long lastCheck = 0;
 
     static {
+        // 在TimeUtil初始化的时候,会进行实例化操作,并开启线程
         INSTANCE = new TimeUtil();
     }
 
